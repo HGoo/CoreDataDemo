@@ -52,7 +52,7 @@ class ViewController: UITableViewController {
             displayP3Red: 21/255,
             green: 101/255,
             blue: 192/255,
-            alpha: 194/255
+            alpha: 255/255
         )
         
         // Title
@@ -82,6 +82,7 @@ class ViewController: UITableViewController {
 
 // MARK: -  Add swipe and tap action
 extension ViewController {
+    
     private func delete(rowIndexPathAt  indexPath: IndexPath) -> UIContextualAction {
         let action = UIContextualAction(style: .destructive, title: "Delete") { (_, _, _) in
             
