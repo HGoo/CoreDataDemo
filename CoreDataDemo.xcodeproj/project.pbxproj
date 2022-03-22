@@ -12,6 +12,7 @@
 		DDBAF55C27E4D90600106A3D /* CoreDataDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = DDBAF55A27E4D90600106A3D /* CoreDataDemo.xcdatamodeld */; };
 		DDBAF55E27E4D90600106A3D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDBAF55D27E4D90600106A3D /* Assets.xcassets */; };
 		DDBAF56127E4D90600106A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DDBAF55F27E4D90600106A3D /* LaunchScreen.storyboard */; };
+		DDBAF56D27EA3DB000106A3D /* UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDBAF56C27EA3DB000106A3D /* UITableViewDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		DDBAF55D27E4D90600106A3D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DDBAF56027E4D90600106A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DDBAF56227E4D90600106A3D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DDBAF56C27EA3DB000106A3D /* UITableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 				DDBAF56227E4D90600106A3D /* Info.plist */,
 				DDBAF55127E4D90600106A3D /* AppDelegate.swift */,
 				DDBAF55527E4D90600106A3D /* ViewController.swift */,
+				DDBAF56C27EA3DB000106A3D /* UITableViewDataSource.swift */,
 				DDBAF55A27E4D90600106A3D /* CoreDataDemo.xcdatamodeld */,
 			);
 			path = CoreDataDemo;
@@ -136,6 +139,7 @@
 			files = (
 				DDBAF55627E4D90600106A3D /* ViewController.swift in Sources */,
 				DDBAF55C27E4D90600106A3D /* CoreDataDemo.xcdatamodeld in Sources */,
+				DDBAF56D27EA3DB000106A3D /* UITableViewDataSource.swift in Sources */,
 				DDBAF55227E4D90600106A3D /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

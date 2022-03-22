@@ -10,9 +10,10 @@ import CoreData
 
 class ViewController: UITableViewController {
     
+    var tasks: [Task] = []
+    let cellID = "cell"
+    
     // MARK: - Private Properties
-    private let cellID = "cell"
-    private var tasks: [Task] = []
     private let manageContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     private var isEditingMode = false
     
@@ -73,50 +74,47 @@ class ViewController: UITableViewController {
         
     }
     
-    private func showAlerrt(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
-            guard let task = alert.textFields?.first?.text, !task.isEmpty else {
-                print("The text field is empty")
-                return
-            }
+    @objc private func addNewTask() {
+        showAlerrt(title: "New task", message: "What do you want to do?")
+    }
+    
+}
+
+// MARK: -  Add swipe and tap action
+extension ViewController {
+    private func delete(rowIndexPathAt  indexPath: IndexPath) -> UIContextualAction {
+        let action = UIContextualAction(style: .destructive, title: "Delete") { (_, _, _) in
             
-            //Add new task tj tasks array
-            self.save(task)
+            let task = self.tasks[indexPath.row]
+            self.deleteTask(task, indexPath: indexPath)
+            
         }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
-        
-        alert.addTextField()
-        alert.addAction(saveAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
+        return action
     }
     
-    private func save(_ taskName: String) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // Entity name
-        guard let entityDescription = NSEntityDescription.entity(forEntityName: "Task", in: manageContext) else { return }
+        let task = tasks[indexPath.row]
         
-        // Model instance
-        let task = NSManagedObject(entity: entityDescription, insertInto: manageContext) as! Task
-        
-        task.name = taskName
-        
-        do {
-            try manageContext.save()
-            tasks.append(task)
-            self.tableView.insertRows(
-                at: [IndexPath(row: self.tasks.count - 1, section: 0)],
-                with: .automatic
-            )
-        } catch let error {
-            print(error.localizedDescription)
+            showAlerrt(title: "Do you want to edit?",
+                        message: "You could do so when we implemebt this functionality",
+                        currentTask: task) { (newValue) in
+
+                tableView.reloadRows(at: [indexPath], with: .automatic)
         }
-        
     }
     
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let delete = self.delete(rowIndexPathAt: indexPath)
+        let swipe = UISwipeActionsConfiguration(actions: [delete])
+        
+        return swipe
+    }
+}
+
+// MARK: - Work id DataBase
+extension ViewController {
     private func fetchdData() {
         //Запрос выборки из базы всех значений по ключу Task
         let fetchRequest: NSFetchRequest<Task> = Task.fetchRequest()
@@ -128,83 +126,93 @@ class ViewController: UITableViewController {
         }
     }
     
-    private func delete(rowIndexPathAt  indexPath: IndexPath) -> UIContextualAction {
-        let action = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, _) in
-            guard let self = self else { return }
-            
-            
-            self.tasks.remove(at: indexPath.row)
-            self.tableView.reloadData()
+    private func saveTask(_ taskName: String) {
+        // Entity name
+        guard let entityDescription = NSEntityDescription.entity(
+            forEntityName: "Task",
+            in: manageContext
+        ) else { return }
+        
+        // Model instance
+        let task = NSManagedObject(entity: entityDescription,
+                                   insertInto: manageContext) as! Task
+       
+        task.name = taskName
+        
+        do {
+            try manageContext.save()
+            tasks.append(task)
+            tableView.insertRows(at: [IndexPath(row: tasks.count - 1, section: 0)],
+                                 with: .automatic)
+        } catch let error {
+            print(error.localizedDescription)
         }
-        return action
     }
     
-    private func edit(rowIndexPathAt indexPath: IndexPath) -> UIContextualAction {
-        let action = UIContextualAction(style: .normal, title: "Edit") { _, _, _ in
-            
-            let alert = UIAlertController(
-                title: "Do you want to edit?",
-                message: "You could do so when we implemebt this functionality",
-                preferredStyle: .alert
-            )
-            
-            let edit = UIAlertAction(title: "OK", style: .default, handler: { _ in
-                guard let task = alert.textFields?.first?.text, !task.isEmpty else {
-                    print("The text field is empty")
-                    return
-                }
-                self.tasks[indexPath.row].name = task
-                self.tableView.reloadData()
-            })
-            
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
-                self.tableView.reloadData()
-            }
-            
-            alert.addAction(edit)
-            alert.addAction(cancel)
-            alert.addTextField { text in
-                text.text = self.tasks[indexPath.row].name
-            }
-            
-            self.present(alert, animated: true)
-            
+    private func editTASK(_ task: Task, newName: String) {
+        
+        do {
+            task.name = newName
+            try manageContext.save()
+        } catch let error {
+            print(error.localizedDescription)
         }
-        return action
     }
     
-    // MARK: - Table View Data Sourse
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    private func deleteTask(_ task: Task, indexPath: IndexPath) {
         
-        let edit = self.edit(rowIndexPathAt: indexPath)
-        let delete = self.delete(rowIndexPathAt: indexPath)
-        let swipe = UISwipeActionsConfiguration(actions: [delete, edit])
+        manageContext.delete(task)
         
-        return swipe
+        do {
+            try manageContext.save()
+            tasks.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        } catch let error {
+            print(error.localizedDescription)
+        }
     }
 }
 
-// MARK: - UITableViewDataSource
+
 extension ViewController {
-    @objc private func addNewTask() {
-        showAlerrt(title: "New task", message: "What do you want to do?")
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tasks.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+    private func showAlerrt(title: String,
+                            message: String,
+                            currentTask: Task? = nil,
+                            completion: ((String) -> ())? = nil) {
         
-        var content = cell.defaultContentConfiguration()
+        let alert = UIAlertController(title: title,
+                                      message: message,
+                                      preferredStyle: .alert)
         
-        let task = tasks[indexPath.row]
+        // Save Action
+        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+            
+            
+            guard let newValue = alert.textFields?.first?.text else { return }
+            guard !newValue.isEmpty else { return }
+            
+            // Edit current task or add new task
+            currentTask != nil ? self.editTASK(currentTask!, newName: newValue) : self.saveTask(newValue)
+            if completion != nil { completion!(newValue) }
+            
+        }
         
-        content.text = task.name
+        // Cancel action
+        let cancelAction = UIAlertAction(title: "Cancel",
+                                   style: .destructive) { _ in
+            if let indexPath = self.tableView.indexPathForSelectedRow {
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+        }
         
-        cell.contentConfiguration = content
+        alert.addTextField()
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
         
-        return cell
+        present(alert, animated: true)
+        
+        if currentTask != nil {
+            alert.textFields?.first?.text = currentTask?.name
+        }
     }
 }
